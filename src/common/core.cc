@@ -105,6 +105,10 @@ std::map<std::string, DiskInfo>& Core::get_disk_usage_info() {
   return disk_info_;
 }
 
+std::map<std::string, CpuInfo>& Core::get_cpu_usage_info() {
+  return cpu_info_;
+}
+
 void Core::refresh_resources() {
   // Poll RAM
   if (sysinfo(&sinfo_) == 0) {
@@ -164,6 +168,47 @@ void Core::refresh_resources() {
       else
         elem->second.update(reads, writes);
     }
+  }
+
+  // Poll CPU
+  std::ifstream cpustream("/proc/stat");
+  long value, used, freed;
+
+  while (cpustream.peek() != EOF) {
+    cpustream >> name;  // CPU name / umber
+
+    if (name.find("cpu") != 0)
+      break;
+
+    used = 0;
+    freed = 0;
+
+    cpustream >> value; // user: normal processes executing in user mode
+    used += value;
+    cpustream >> value; // nice: niced processes executing in user mode
+    used += value;
+    cpustream >> value; // system: processes executing in kernel mode
+    used += value;
+    cpustream >> value; // idle: twiddling thumbs
+    freed += value;
+    cpustream >> value; // iowait: In a word, iowait stands for waiting for I/O to complete.
+    freed += value;
+    cpustream >> value; // irq: servicing interrupts
+    freed += value;
+    cpustream >> value; // softirq: servicing softirqs
+    used += value;
+    cpustream >> value; // steal: involuntary wait
+    freed += value;
+    cpustream >> value; // guest: running a normal guest
+    used += value;
+    cpustream >> value; // guest_nice: running a niced guest
+    used += value;
+
+    auto elem = cpu_info_.find(name);
+    if (elem == cpu_info_.end())
+      cpu_info_[name] = CpuInfo(used, freed);
+    else
+      elem->second.update(used, freed);
   }
 }
 

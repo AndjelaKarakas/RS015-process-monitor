@@ -8,6 +8,7 @@
 #include <map>
 #include <vector>
 
+#include "cpuinfo.h"
 #include "diskinfo.h"
 #include "processinfo.h"
 #include "sysmemoryinfo.h"
@@ -56,6 +57,12 @@ class Core {
   // Use refresh_resources() to update this value.
   std::map<std::string, DiskInfo>& get_disk_usage_info();
 
+  // Gets the REFERENCE to the list containing
+  // information regarding cpu usage.
+  //
+  // Use refresh_resources() to update this value.
+  std::map<std::string, CpuInfo>& get_cpu_usage_info();
+
   // Refreshes the global resource information.
   void refresh_resources();
 
@@ -72,6 +79,7 @@ private:
   std::ifstream steam_diskstats_;
   struct sysinfo sinfo_;
   std::map<std::string, DiskInfo> disk_info_;
+  std::map<std::string, CpuInfo> cpu_info_;
 };
 
 }
