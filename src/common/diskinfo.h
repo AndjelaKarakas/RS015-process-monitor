@@ -2,23 +2,32 @@
 
 namespace ProcessMonitor {
 
-// Contains basic information about disk I/O
+// Contains basic information about disk I/O.
+//
+// 1 sector is always equal to 512 bytes.
+// (its hardcoded in some parts of Linux kernel)
+// (also WHYYY?)
 class DiskInfo {
   public:
-    // Name of the partition or drive
-    std::string name;
+    DiskInfo();
+    DiskInfo(long total_reads, long total_writes);
 
-    // Total number of sectors read
-    int total_reads;
+    // Numbers of bytes read since the last call.
+    long get_bytes_read();
+    // Number of bytes written since the last call.
+    long get_bytes_written();
 
-    // Total number of sectors written
-    int total_writes;
+    void update(long total_reads, long total_writes);
 
-    // Number of sector reads since the last call
-    int reads;
-
-    // Number of sector writes since the last call
-    int writes;
+  private:
+    // Number of sector reads since the last call.
+    long reads_;
+    // Number of sector writes since the last call.
+    long writes_;
+    // Total number of sectors read.
+    long total_reads_;
+    // Total number of sectors written.
+    long total_writes_;
 };
 
 }

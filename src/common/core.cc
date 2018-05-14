@@ -12,9 +12,8 @@
 
 namespace ProcessMonitor {
 
-Core::Core() {
-  pids_ = std::vector<int>(1024);
-  disk_info_ = std::map<std::string, DiskInfo>();
+Core::Core() :
+  steam_diskstats_("/proc/diskstats") {
 
   proc_dir_ = opendir("/proc");
   if (proc_dir_ == NULL)
@@ -88,7 +87,7 @@ void Core::refresh_pids() {
       }
     }
 
-    if (curnum != -1) // TODO: Ensure array size
+    if (curnum != -1)
       pids_.push_back(curnum);
   }
 }
@@ -102,49 +101,63 @@ std::map<std::string, DiskInfo>& Core::get_disk_usage_info() {
 }
 
 void Core::refresh_resources() {
-  std::string temp;
-
   // Poll RAM
-  struct sysinfo sinfo; // TODO: Make a local variable instead
-  if (sysinfo(&sinfo) == 0) {
-    mem_info_.memory_usage = sinfo.totalram - sinfo.freeram;
-    mem_info_.swap_usage = sinfo.totalswap - sinfo.freeswap;
-    mem_info_.total_memory = sinfo.totalram;
-    mem_info_.total_swap = sinfo.totalswap;
+  if (sysinfo(&sinfo_) == 0) {
+    mem_info_.memory_usage = sinfo_.totalram - sinfo_.freeram;
+    mem_info_.swap_usage = sinfo_.totalswap - sinfo_.freeswap;
+    mem_info_.total_memory = sinfo_.totalram;
+    mem_info_.total_swap = sinfo_.totalswap;
   }
 
   // Poll Drives
-  std::ifstream infile("/proc/diskstats");
+  std::string name;
+  long reads, writes;
+  bool valid = false;
 
-  while (!infile.eof()) // TODO: Optimize...
-  {
-    DiskInfo dinfo;
-    infile >> temp;
-    infile >> temp;
-    infile >> dinfo.name;
-    infile >> temp;
-    infile >> temp;
-    infile >> dinfo.total_reads;
-    infile >> temp;
-    infile >> temp;
-    infile >> temp;
-    infile >> dinfo.total_writes;
-    infile >> temp;
-    infile >> temp;
-    infile >> temp;
-    infile >> temp;
-    
-    dinfo.reads = 0;
-    dinfo.writes = 0;
+  steam_diskstats_.clear();
+  steam_diskstats_.seekg(0, std::ios::beg);
 
-    if (dinfo.name.find("sd") == 0)
-    {
-      auto elem = disk_info_.find(dinfo.name);
-      if (elem != disk_info_.end()) {
-        dinfo.reads = dinfo.total_reads - elem->second.total_reads;
-        dinfo.writes = dinfo.total_writes - elem->second.total_writes;
-      }
-      disk_info_[dinfo.name] = dinfo;
+  while (steam_diskstats_.peek() != EOF) { // TODO: Remove disconnected drives.
+    steam_diskstats_.ignore(4);              // major number
+    steam_diskstats_.ignore(8);              // minnor number
+
+    steam_diskstats_ >> name;                // device name
+    steam_diskstats_.ignore(1);
+    valid = (name.find("sd") == 0);
+
+    steam_diskstats_.ignore(255, ' ');       // reads completed successfully
+    steam_diskstats_.ignore(255, ' ');       // reads merged
+
+    if (valid) {                             // sectors read
+      steam_diskstats_ >> reads;
+      steam_diskstats_.ignore(1);
+    } else {
+      steam_diskstats_.ignore(255, ' ');
+    }
+
+    steam_diskstats_.ignore(255, ' ');       // time spent reading (ms)
+    steam_diskstats_.ignore(255, ' ');       // writes completed
+    steam_diskstats_.ignore(255, ' ');       // writes merged
+
+    if (valid) {                             // sectors written
+      steam_diskstats_ >> writes;
+      steam_diskstats_.ignore(1);
+    } else {
+      steam_diskstats_.ignore(255, ' ');
+    }
+
+    steam_diskstats_.ignore(255, ' ');       // time spent writing (ms)
+    steam_diskstats_.ignore(255, ' ');       // I/Os currently in progress
+    steam_diskstats_.ignore(255, ' ');       // time spent doing I/Os (ms)
+    steam_diskstats_.ignore(255, '\n');      // weighted time spent doing I/Os (ms)
+
+    if (valid) {
+      auto elem = disk_info_.find(name);
+
+      if (elem == disk_info_.end())
+        disk_info_[name] = DiskInfo(reads, writes);
+      else
+        elem->second.update(reads, writes);
     }
   }
 }

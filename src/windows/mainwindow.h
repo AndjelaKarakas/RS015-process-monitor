@@ -22,7 +22,7 @@ class MainWindow : public Gtk::Window {
   Gtk::RadioButton* radioresources_;
   Gtk::Notebook* notebookmain_;
   ProcessView* processview_;
-  ResourceView* graphview_;
+  ResourceView* resourceview_;
 };
 
 }

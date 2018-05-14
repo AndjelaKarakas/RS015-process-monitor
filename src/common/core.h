@@ -1,8 +1,10 @@
 #ifndef PROCESSMONITOR_COMMON_CORE_H_
 #define PROCESSMONITOR_COMMON_CORE_H_
 
+#include <sys/sysinfo.h>
 #include <sys/types.h>
 #include <dirent.h>
+#include <fstream>
 #include <map>
 #include <vector>
 
@@ -24,7 +26,7 @@ class Core {
 
   // Returns an instance of the Core class.
   static Core& getInstance();
-
+  
   // Gets the REFERENCE to the pid list.
   //
   // Use refresh_pids() to actually update the list.
@@ -61,6 +63,8 @@ private:
 
   // Resource related stuff
   SysMemoryInfo mem_info_;
+  std::ifstream steam_diskstats_;
+  struct sysinfo sinfo_;
   std::map<std::string, DiskInfo> disk_info_;
 };
 

@@ -46,10 +46,10 @@ int main(int argc, char *argv[]) {
     core.refresh_resources();
 
     std::cout << "[Resource Usage]" << std::endl;
-    std::cout << "Memory: " << meminfo.memory_usage / 1073741824.0 << "GB / " << meminfo.total_memory / 1073741824.0 << "GB" << std::endl;
-    std::cout << "Swap: " << meminfo.swap_usage / 1073741824.0 << "GB / " << meminfo.total_swap / 1073741824.0 << "GB" << std::endl;
+    std::cout << "Memory: " << meminfo.memory_usage / 1073741824.0 << " GB / " << meminfo.total_memory / 1073741824.0 << " GB" << std::endl;
+    std::cout << "Swap: " << meminfo.swap_usage / 1073741824.0 << " GB / " << meminfo.total_swap / 1073741824.0 << " GB" << std::endl;
     for (auto& info : diskinfo)
-      std::cout << "[" << info.second.name << "] Reads: " << info.second.reads << " Writes: " << info.second.writes << std::endl;
+      std::cout << "[" << info.first << "] Reads: " << info.second.get_bytes_read() << " Writes: " << info.second.get_bytes_written() << std::endl;
     std::cout << std::endl;
 
     sleep(1);

@@ -26,11 +26,11 @@ MainWindow::MainWindow(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>
   builder_->get_widget("notebookmain", notebookmain_);
 
   // fill up notebook
-  graphview_ = ResourceView::Create();
-  notebookmain_->append_page(*graphview_);
-
   processview_ = ProcessView::Create();
   notebookmain_->append_page(*processview_);
+
+  resourceview_ = ResourceView::Create();
+  notebookmain_->append_page(*resourceview_);
 
   show_all();
 

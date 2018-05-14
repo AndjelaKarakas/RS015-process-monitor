@@ -16,6 +16,7 @@ src = [
   # common
   'common/core.cc',
   'common/core.h',
+  'common/diskinfo.cc',
   'common/diskinfo.h',
   'common/processinfo.h',
   'common/sysmemoryinfo.h',
