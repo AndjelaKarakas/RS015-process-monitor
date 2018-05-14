@@ -109,6 +109,10 @@ std::map<std::string, CpuInfo>& Core::get_cpu_usage_info() {
   return cpu_info_;
 }
 
+NetInfo& Core::get_network_info() {
+  return net_info_;
+}
+
 void Core::refresh_resources() {
   // Poll RAM
   if (sysinfo(&sinfo_) == 0) {
@@ -210,6 +214,9 @@ void Core::refresh_resources() {
     else
       elem->second.update(used, freed);
   }
+
+  // Poll Network
+  net_info_.update();
 }
 
 }

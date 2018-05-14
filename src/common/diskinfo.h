@@ -1,3 +1,6 @@
+#ifndef PROCESSMONITOR_COMMON_DISKINFO_H_
+#define PROCESSMONITOR_COMMON_DISKINFO_H_
+
 #include <string>
 
 namespace ProcessMonitor {
@@ -31,3 +34,5 @@ class DiskInfo {
 };
 
 }
+
+#endif

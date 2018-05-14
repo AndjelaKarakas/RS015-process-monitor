@@ -10,6 +10,7 @@
 
 #include "cpuinfo.h"
 #include "diskinfo.h"
+#include "netinfo.h"
 #include "processinfo.h"
 #include "sysmemoryinfo.h"
 
@@ -63,6 +64,8 @@ class Core {
   // Use refresh_resources() to update this value.
   std::map<std::string, CpuInfo>& get_cpu_usage_info();
 
+  NetInfo& get_network_info();
+
   // Refreshes the global resource information.
   void refresh_resources();
 
@@ -80,6 +83,7 @@ private:
   struct sysinfo sinfo_;
   std::map<std::string, DiskInfo> disk_info_;
   std::map<std::string, CpuInfo> cpu_info_;
+  NetInfo net_info_;
 };
 
 }

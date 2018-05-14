@@ -1,3 +1,5 @@
+#ifndef PROCESSMONITOR_COMMON_CPUINFO_H_
+#define PROCESSMONITOR_COMMON_CPUINFO_H_
 
 namespace ProcessMonitor {
 
@@ -17,3 +19,5 @@ class CpuInfo {
 };
 
 }
+
+#endif
