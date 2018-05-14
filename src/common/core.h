@@ -26,14 +26,19 @@ class Core {
 
   // Returns an instance of the Core class.
   static Core& getInstance();
-  
+
   // Gets the REFERENCE to the pid list.
   //
   // Use refresh_pids() to actually update the list.
   std::vector<int>& get_pid_list();
 
+  // Gets the REFERENCE to the process information class.
+  //
+  // Use load_pid_info(int pid) to update this value.
+  ProcessInfo& get_pid_info();
+
   // Return info related to the passed pid.
-  ProcessInfo get_pid_info(int pid);
+  void load_pid_info(int pid);
 
   // Refreshes the pid list.
   void refresh_pids();
@@ -60,6 +65,7 @@ private:
   // Process related stuff
   DIR* proc_dir_;
   std::vector<int> pids_;
+  ProcessInfo pid_info_;
 
   // Resource related stuff
   SysMemoryInfo mem_info_;

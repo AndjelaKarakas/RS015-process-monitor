@@ -18,14 +18,15 @@ int main(int argc, char *argv[]) {
 
   /* ProcessView interaction example
   
-  ProcessMonitor::Core& core = ProcessMonitor::Core::getInstance();
-  std::vector<int>& pids = core.get_pid_list();
+  auto& core = ProcessMonitor::Core::getInstance();
+  auto& pids = core.get_pid_list();
+  auto& pidinfo = core.get_pid_info();
 
   while (true) {
     core.refresh_pids();
 
     for (auto &pid : pids) {
-      auto pidinfo = core.get_pid_info(pid);
+      core.load_pid_info(pid);
       std::cout << pid << " " << pidinfo.name << " " << pidinfo.memory << std::endl;
     }
 

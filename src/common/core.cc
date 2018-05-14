@@ -29,40 +29,45 @@ std::vector<int>& Core::get_pid_list() {
   return pids_;
 }
 
-ProcessInfo Core::get_pid_info(int pid) {
-  ProcessInfo ret;
+ProcessInfo& Core::get_pid_info() {
+  return pid_info_;
+}
+
+void Core::load_pid_info(int pid) {
   std::ifstream infile("/proc/" + std::to_string(pid) + "/stat");
   std::string temp;
   
-  infile >> ret.pid;
-  infile >> ret.name;
+  infile >> pid_info_.pid;          // process id
+  infile >> pid_info_.name;         // filename of the executable
+  infile.ignore(1);
   
-  // TODO: Use some of this info later... also optimize?
-  infile >> temp;
-  infile >> temp;
-  infile >> temp;
-  infile >> temp;
-  infile >> temp;
-  infile >> temp;
-  infile >> temp;
-  infile >> temp;
-  infile >> temp;
-  infile >> temp;
-  infile >> temp;
-  infile >> temp;
-  infile >> temp;
-  infile >> temp;
-  infile >> temp;
-  infile >> temp;
-  infile >> temp;
-  infile >> temp;
-  infile >> temp;
-  infile >> temp;
+  infile.ignore(255, ' ');          // state (R is running, S is sleeping, D is sleeping in an uninterruptible wait, Z is zombie, T is traced or stopped)
+  infile.ignore(255, ' ');          // process id of the parent process
+  infile.ignore(255, ' ');          // pgrp of the process
+  infile.ignore(255, ' ');          // session id
+  infile.ignore(255, ' ');          // tty the process uses
+  infile.ignore(255, ' ');          // pgrp of the tty
+  infile.ignore(255, ' ');          // task flags
+  infile.ignore(255, ' ');          // number of minor faults
+  infile.ignore(255, ' ');          // number of minor faults with child's
+  infile.ignore(255, ' ');          // number of major faults
+  infile.ignore(255, ' ');          // number of major faults with child's
+  infile.ignore(255, ' ');          // user mode jiffies
+  infile.ignore(255, ' ');          // kernel mode jiffies
+  infile.ignore(255, ' ');          // user mode jiffies with child's
+  infile.ignore(255, ' ');          // kernel mode jiffies with child's
 
-  infile >> ret.memory;
+  infile >> pid_info_.priority;     // priority level
+  infile >> pid_info_.nice_level;   // nice level
+  infile.ignore(1);
+
+  infile.ignore(255, ' ');          // number of threads
+  infile.ignore(255, ' ');          // (obsolete, always 0)
+  infile.ignore(255, ' ');          // time the process started after system boot
+
+  infile >> pid_info_.memory;       // virtual memory size
 
   infile.close();
-  return ret;
 }
 
 void Core::refresh_pids() {
