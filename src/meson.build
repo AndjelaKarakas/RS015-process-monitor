@@ -22,6 +22,7 @@ src = [
   'common/diskinfo.h',
   'common/netinfo.cc',
   'common/netinfo.h',
+  'common/processinfo.cc',
   'common/processinfo.h',
   'common/sysmemoryinfo.h',
 

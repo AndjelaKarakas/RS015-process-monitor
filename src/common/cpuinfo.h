@@ -9,6 +9,7 @@ class CpuInfo {
     CpuInfo(long total_used_jifs, long total_free_jifs);
 
     double get_percentage_usage();
+    double get_total_jifs();
     void update(long total_used_jifs, long total_free_jifs);
 
   private:

@@ -31,43 +31,37 @@ class Core {
 
   // Gets the REFERENCE to the pid list.
   //
-  // Use refresh_pids() to actually update the list.
+  // Use refresh() to actually update the list.
   std::vector<int>& get_pid_list();
 
   // Gets the REFERENCE to the process information class.
   //
-  // Use load_pid_info(int pid) to update this value.
-  ProcessInfo& get_pid_info();
-
-  // Return info related to the passed pid.
-  void load_pid_info(int pid);
-
-  // Refreshes the pid list.
-  void refresh_pids();
+  // Use refresh() to update this value.
+  ProcessInfo& get_pid_info(int pid);
 
   // Gets the REFERENCE to the SysMemoryUsage class
   // thats containing the basic information about
   // the system memory usage.
   //
-  // Use refresh_resources() to update this value.
+  // Use refresh() to update this value.
   SysMemoryInfo& get_memory_usage();
 
   // Gets the REFERENCE to the list containing
   // information regarding disk usage in bytes.
   //
-  // Use refresh_resources() to update this value.
+  // Use refresh() to update this value.
   std::map<std::string, DiskInfo>& get_disk_usage_info();
 
   // Gets the REFERENCE to the list containing
   // information regarding cpu usage.
   //
-  // Use refresh_resources() to update this value.
+  // Use refresh() to update this value.
   std::map<std::string, CpuInfo>& get_cpu_usage_info();
 
   NetInfo& get_network_info();
 
   // Refreshes the global resource information.
-  void refresh_resources();
+  void refresh();
 
 private:
   Core();
@@ -75,7 +69,7 @@ private:
   // Process related stuff
   DIR* proc_dir_;
   std::vector<int> pids_;
-  ProcessInfo pid_info_;
+  std::map<int, ProcessInfo> pid_info_;
 
   // Resource related stuff
   SysMemoryInfo mem_info_;

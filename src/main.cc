@@ -17,17 +17,15 @@ int main(int argc, char *argv[]) {
 
 
   /* ProcessView interaction example
-  
   auto& core = ProcessMonitor::Core::getInstance();
   auto& pids = core.get_pid_list();
-  auto& pidinfo = core.get_pid_info();
 
   while (true) {
-    core.refresh_pids();
+    core.refresh();
 
     for (auto &pid : pids) {
-      core.load_pid_info(pid);
-      std::cout << pid << " " << pidinfo.name << " " << pidinfo.memory << std::endl;
+      auto& pidinfo = core.get_pid_info(pid);
+      std::cout << pid << " " << pidinfo.name << " " << pidinfo.get_cpu_percentage_usage() << " " << pidinfo.memory << std::endl;
     }
 
     // "lazy" pause
@@ -46,7 +44,7 @@ int main(int argc, char *argv[]) {
   auto& netinfo = core.get_network_info();
 
   while (true) {
-    core.refresh_resources();
+    core.refresh();
 
     std::cout << "[Resource Usage]" << std::endl;
     std::cout << "Memory: " << meminfo.memory_usage / 1073741824.0 << " GB / " << meminfo.total_memory / 1073741824.0 << " GB" << std::endl;

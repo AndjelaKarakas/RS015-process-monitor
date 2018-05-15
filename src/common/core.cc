@@ -29,48 +29,76 @@ std::vector<int>& Core::get_pid_list() {
   return pids_;
 }
 
-ProcessInfo& Core::get_pid_info() {
-  return pid_info_;
-}
+ProcessInfo& Core::get_pid_info(int pid) {
+  auto elem = pid_info_.find(pid);
+  long ujifs, kjifs;
 
-void Core::load_pid_info(int pid) {
+  if (elem == pid_info_.end())
+  {
+    pid_info_[pid] = ProcessInfo();
+    elem = pid_info_.find(pid);
+  }
+
   std::ifstream infile("/proc/" + std::to_string(pid) + "/stat");
   std::string temp;
   
-  infile >> pid_info_.pid;          // process id
-  infile >> pid_info_.name;         // filename of the executable
+  infile >> elem->second.pid;         // process id
+  infile >> elem->second.name;        // filename of the executable
   infile.ignore(1);
   
-  infile.ignore(255, ' ');          // state (R is running, S is sleeping, D is sleeping in an uninterruptible wait, Z is zombie, T is traced or stopped)
-  infile.ignore(255, ' ');          // process id of the parent process
-  infile.ignore(255, ' ');          // pgrp of the process
-  infile.ignore(255, ' ');          // session id
-  infile.ignore(255, ' ');          // tty the process uses
-  infile.ignore(255, ' ');          // pgrp of the tty
-  infile.ignore(255, ' ');          // task flags
-  infile.ignore(255, ' ');          // number of minor faults
-  infile.ignore(255, ' ');          // number of minor faults with child's
-  infile.ignore(255, ' ');          // number of major faults
-  infile.ignore(255, ' ');          // number of major faults with child's
-  infile.ignore(255, ' ');          // user mode jiffies
-  infile.ignore(255, ' ');          // kernel mode jiffies
-  infile.ignore(255, ' ');          // user mode jiffies with child's
-  infile.ignore(255, ' ');          // kernel mode jiffies with child's
+  infile.ignore(255, ' ');            // state (R is running, S is sleeping, D is sleeping in an uninterruptible wait, Z is zombie, T is traced or stopped)
+  infile.ignore(255, ' ');            // process id of the parent process
+  infile.ignore(255, ' ');            // pgrp of the process
+  infile.ignore(255, ' ');            // session id
+  infile.ignore(255, ' ');            // tty the process uses
+  infile.ignore(255, ' ');            // pgrp of the tty
+  infile.ignore(255, ' ');            // task flags
+  infile.ignore(255, ' ');            // number of minor faults
+  infile.ignore(255, ' ');            // number of minor faults with child's
+  infile.ignore(255, ' ');            // number of major faults
+  infile.ignore(255, ' ');            // number of major faults with child's
+  
+  infile >> ujifs;                    // user mode jiffies
+  infile >> kjifs;                    // user mode jiffies
+  infile.ignore(1);
+  
+  infile.ignore(255, ' ');            // user mode jiffies with child's
+  infile.ignore(255, ' ');            // kernel mode jiffies with child's
 
-  infile >> pid_info_.priority;     // priority level
-  infile >> pid_info_.nice_level;   // nice level
+  infile >> elem->second.priority;    // priority level
+  infile >> elem->second.nice_level;  // nice level
   infile.ignore(1);
 
-  infile.ignore(255, ' ');          // number of threads
-  infile.ignore(255, ' ');          // (obsolete, always 0)
-  infile.ignore(255, ' ');          // time the process started after system boot
+  infile.ignore(255, ' ');            // number of threads
+  infile.ignore(255, ' ');            // (obsolete, always 0)
+  infile.ignore(255, ' ');            // time the process started after system boot
 
-  infile >> pid_info_.memory;       // virtual memory size
+  infile >> elem->second.memory;      // virtual memory size
 
   infile.close();
+
+  elem->second.update(ujifs + kjifs);
+  return elem->second;
 }
 
-void Core::refresh_pids() {
+SysMemoryInfo& Core::get_memory_usage() {
+  return mem_info_;
+}
+
+std::map<std::string, DiskInfo>& Core::get_disk_usage_info() {
+  return disk_info_;
+}
+
+std::map<std::string, CpuInfo>& Core::get_cpu_usage_info() {
+  return cpu_info_;
+}
+
+NetInfo& Core::get_network_info() {
+  return net_info_;
+}
+
+void Core::refresh() {
+  // Poll Processes
   pids_.clear();
 
   struct dirent* entry;
@@ -95,25 +123,7 @@ void Core::refresh_pids() {
     if (curnum != -1)
       pids_.push_back(curnum);
   }
-}
 
-SysMemoryInfo& Core::get_memory_usage() {
-  return mem_info_;
-}
-
-std::map<std::string, DiskInfo>& Core::get_disk_usage_info() {
-  return disk_info_;
-}
-
-std::map<std::string, CpuInfo>& Core::get_cpu_usage_info() {
-  return cpu_info_;
-}
-
-NetInfo& Core::get_network_info() {
-  return net_info_;
-}
-
-void Core::refresh_resources() {
   // Poll RAM
   if (sysinfo(&sinfo_) == 0) {
     mem_info_.memory_usage = sinfo_.totalram - sinfo_.freeram;
