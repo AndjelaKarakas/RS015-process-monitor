@@ -13,8 +13,10 @@ class ProcessInfo {
  public:
   ProcessInfo();
 
+  long get_bytes_read();
+  long get_bytes_written();
   double get_cpu_percentage_usage();
-  void update(long cpu_jits);
+  void update(long cpu_jits, long bytes_read, long bytes_written);
 
   // Name of the process.
   std::string name;
@@ -37,6 +39,10 @@ class ProcessInfo {
  private:
   long total_cpu_jits_;
   long cpu_jits_;
+  long total_bytes_read_;
+  long bytes_read_;
+  long total_bytes_written_;
+  long bytes_written_;
 };
 
 }

@@ -34,6 +34,9 @@ std::vector<int>& Core::get_pid_list() {
 ProcessInfo& Core::get_pid_info(int pid) {
   auto elem = pid_info_.find(pid);
   long ujifs, kjifs;
+  long bytes_read = 0;
+  long bytes_written = 0;
+  std::string temp;
 
   if (elem == pid_info_.end())
   {
@@ -44,8 +47,18 @@ ProcessInfo& Core::get_pid_info(int pid) {
   if (stat(("/proc/" + std::to_string(pid)).c_str(), &statbuf_) == 0)
     elem->second.uid = statbuf_.st_uid;
 
+  std::ifstream iofile("/proc/" + std::to_string(pid) + "/io");
+  while (iofile.peek() != EOF) {
+    iofile >> temp;
+    if (temp == "read_bytes:")
+      iofile >> bytes_read;
+    else if (temp == "write_bytes:")
+      iofile >> bytes_written;
+    else
+      iofile.ignore(255, '\n');
+  }
+
   std::ifstream infile("/proc/" + std::to_string(pid) + "/stat");
-  std::string temp;
   
   infile >> elem->second.pid;         // process id
   infile >> elem->second.name;        // filename of the executable
@@ -82,7 +95,7 @@ ProcessInfo& Core::get_pid_info(int pid) {
 
   infile.close();
 
-  elem->second.update(ujifs + kjifs);
+  elem->second.update(ujifs + kjifs, bytes_read, bytes_written);
   return elem->second;
 }
 

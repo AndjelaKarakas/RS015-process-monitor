@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
   auto app = Gtk::Application::create(argc, argv, "org.gnome.process-monitor");
   auto window = ProcessMonitor::MainWindow::Create();
 
-  return app->run(*window);
+  return app->run(*window);//*/
 
 
 
@@ -25,13 +25,13 @@ int main(int argc, char *argv[]) {
 
     for (auto &pid : pids) {
       auto& pidinfo = core.get_pid_info(pid);
-      std::cout << pid << " " << pidinfo.name << " " << pidinfo.uid << " " << pidinfo.get_cpu_percentage_usage() << " " << pidinfo.memory << std::endl;
+      std::cout << pid << " " << pidinfo.name << " " << pidinfo.uid << " " << pidinfo.get_cpu_percentage_usage() << " " << pidinfo.memory << " " << pidinfo.get_bytes_read() << " " << pidinfo.get_bytes_written() << std::endl;
     }
 
     // "lazy" pause
     char c;
     std::cin >> c;
-  }*/
+  }//*/
 
 
 
@@ -58,5 +58,5 @@ int main(int argc, char *argv[]) {
     std::cout << std::endl;
 
     sleep(1);
-  }*/
+  }//*/
 }
