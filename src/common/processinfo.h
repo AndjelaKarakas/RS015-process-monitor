@@ -22,6 +22,9 @@ class ProcessInfo {
   // Process id number.
   int pid;
 
+  // Process uid number.
+  int uid;
+
   // Memory used (in bytes).
   long memory;
 

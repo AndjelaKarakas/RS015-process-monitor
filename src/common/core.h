@@ -1,11 +1,13 @@
 #ifndef PROCESSMONITOR_COMMON_CORE_H_
 #define PROCESSMONITOR_COMMON_CORE_H_
 
+#include <sys/stat.h>
 #include <sys/sysinfo.h>
 #include <sys/types.h>
 #include <dirent.h>
 #include <fstream>
 #include <map>
+#include <unistd.h>
 #include <vector>
 
 #include "cpuinfo.h"
@@ -70,6 +72,7 @@ private:
   DIR* proc_dir_;
   std::vector<int> pids_;
   std::map<int, ProcessInfo> pid_info_;
+  struct stat statbuf_;
 
   // Resource related stuff
   SysMemoryInfo mem_info_;

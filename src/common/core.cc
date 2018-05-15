@@ -1,11 +1,13 @@
 #include "core.h"
 
-#include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/sysinfo.h>
+#include <sys/types.h>
 #include <dirent.h>
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <unistd.h>
 #include <vector>
 #include <stdexcept>
 #include <string>
@@ -38,6 +40,9 @@ ProcessInfo& Core::get_pid_info(int pid) {
     pid_info_[pid] = ProcessInfo();
     elem = pid_info_.find(pid);
   }
+
+  if (stat(("/proc/" + std::to_string(pid)).c_str(), &statbuf_) == 0)
+    elem->second.uid = statbuf_.st_uid;
 
   std::ifstream infile("/proc/" + std::to_string(pid) + "/stat");
   std::string temp;

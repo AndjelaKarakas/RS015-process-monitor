@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
 
     for (auto &pid : pids) {
       auto& pidinfo = core.get_pid_info(pid);
-      std::cout << pid << " " << pidinfo.name << " " << pidinfo.get_cpu_percentage_usage() << " " << pidinfo.memory << std::endl;
+      std::cout << pid << " " << pidinfo.name << " " << pidinfo.uid << " " << pidinfo.get_cpu_percentage_usage() << " " << pidinfo.memory << std::endl;
     }
 
     // "lazy" pause
