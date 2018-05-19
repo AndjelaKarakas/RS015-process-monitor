@@ -2,6 +2,7 @@
 <gresources>
   <gresource prefix="/">
     <!-- widgets -->
+    <file preprocess="xml-stripblanks">widgets/graphview.glade</file>
     <file preprocess="xml-stripblanks">widgets/resourceview.glade</file>
     <file preprocess="xml-stripblanks">widgets/processview.glade</file>
 
