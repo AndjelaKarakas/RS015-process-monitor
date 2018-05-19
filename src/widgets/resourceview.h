@@ -3,6 +3,8 @@
 
 #include <gtkmm.h>
 
+#include "graphview.h"
+
 namespace ProcessMonitor {
 
 class ResourceView : public Gtk::Box {
@@ -12,6 +14,7 @@ class ResourceView : public Gtk::Box {
 
  private:
   Glib::RefPtr<Gtk::Builder> builder_;
+  GraphView* graph_view_;
 };
 
 }
