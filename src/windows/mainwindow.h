@@ -13,10 +13,15 @@ class MainWindow : public Gtk::Window {
   static MainWindow* Create();
   MainWindow(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder> &refGlade);
 
+  void connect_app_menu(Glib::RefPtr<Gtk::Application> app);
+
  private:
   void on_tabbutton1_activate();
   void on_tabbutton2_activate();
+  void about_activated(const Glib::VariantBase& arg);
+  void quit_activated(const Glib::VariantBase& arg);
 
+  Glib::RefPtr<Gtk::Application> app_;
   Glib::RefPtr<Gtk::Builder> builder_;
   Gtk::RadioButton* radioprocess_;
   Gtk::RadioButton* radioresources_;

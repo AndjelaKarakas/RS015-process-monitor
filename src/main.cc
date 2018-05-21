@@ -9,9 +9,27 @@ int main(int argc, char *argv[]) {
   // TODO: Make separate debug and release configurations
   putenv((char*)"GTK_THEME=Adwaita-dark");
 
-  auto app = Gtk::Application::create(argc, argv, "org.gnome.process-monitor");
-  auto window = ProcessMonitor::MainWindow::Create();
+  auto app = Gtk::Application::create("org.gnome.process-monitor");
+  app->register_application();
 
+  auto window = ProcessMonitor::MainWindow::Create();
+  app->add_window(*window);
+
+  // Create app menu
+  auto menu = Gio::Menu::create();
+  menu->append_item(Gio::MenuItem::create("About", "app.about"));
+  menu->append_item(Gio::MenuItem::create("Quit", "app.quit"));
+  app->set_app_menu(menu);
+
+  // Connect signals to app menu
+  
+  window->connect_app_menu(app);
+  /*auto about_item = Gio::SimpleAction::create("about");
+  about_item->signal_activate().connect(
+    sigc::mem_fun(nullptr, about_activated)
+  );*/
+
+  window->show_all();
   return app->run(*window);//*/
 
 
