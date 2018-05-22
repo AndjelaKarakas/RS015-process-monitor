@@ -29,6 +29,8 @@ src = [
   'common/processinfo.cc',
   'common/processinfo.h',
   'common/sysmemoryinfo.h',
+  'common/util.cc',
+  'common/util.h',
 
   # windows
   'windows/mainwindow.cc',

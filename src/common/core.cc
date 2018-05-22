@@ -164,7 +164,7 @@ void Core::refresh() {
 
     steam_diskstats_ >> name;                // device name
     steam_diskstats_.ignore(1);
-    valid = (name.find("sd") == 0);
+    valid = valid_drive_name(name);
 
     steam_diskstats_.ignore(255, ' ');       // reads completed successfully
     steam_diskstats_.ignore(255, ' ');       // reads merged
@@ -245,6 +245,14 @@ void Core::refresh() {
 
   // Poll Network
   net_info_.update();
+}
+
+bool Core::valid_drive_name(std::string name) {
+  for (auto& c : name)
+    if (isdigit(c))
+      return false;
+
+  return (name.find("sd") == 0);
 }
 
 }

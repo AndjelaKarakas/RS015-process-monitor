@@ -68,6 +68,8 @@ class Core {
 private:
   Core();
 
+  bool valid_drive_name(std::string name);
+
   // Process related stuff
   DIR* proc_dir_;
   std::vector<int> pids_;

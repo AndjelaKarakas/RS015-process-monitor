@@ -3,6 +3,8 @@
 #include <iostream>
 #include <gtkmm.h>
 
+#include "common/util.h"
+
 namespace ProcessMonitor {
 
 GraphView* GraphView::Create() {
@@ -28,9 +30,13 @@ GraphView::GraphView(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>& 
   );
 }
 
-bool GraphView::draw_graph(const Cairo::RefPtr<Cairo::Context>& context) {
+void GraphView::update(int timer) {
+  for (auto& pair : lines_)
+    pair.second.update(timer);
   drawing_area_->queue_draw();
+}
 
+bool GraphView::draw_graph(const Cairo::RefPtr<Cairo::Context>& context) {
   auto draw_width = drawing_area_->get_allocated_width();
   auto draw_height = drawing_area_->get_allocated_height();
 
@@ -52,7 +58,7 @@ bool GraphView::draw_graph(const Cairo::RefPtr<Cairo::Context>& context) {
   context->line_to(draw_width, draw_height * 3 / 4);
 
   context->stroke();
-
+  
   for (auto& pair : lines_)
     pair.second.draw(context, draw_width, draw_height);
 
@@ -71,6 +77,10 @@ bool GraphView::draw_graph(const Cairo::RefPtr<Cairo::Context>& context) {
   return true;
 }
 
+void GraphView::add_line(std::string line, Gdk::RGBA rgba) {
+  add_line(line, rgba.get_red(), rgba.get_green(), rgba.get_blue());
+}
+
 void GraphView::add_line(std::string line, double red, double green, double blue) {
   GraphLine& gline = lines_[line];
   gline.set_color(red, green, blue);
@@ -80,8 +90,15 @@ void GraphView::add_line(std::string line, double red, double green, double blue
   colorbox_->show_all();
 }
 
-void GraphView::add_point(std::string line, double value) {
-  lines_[line].add_point(1.0 - value);
+void GraphView::add_point(std::string line, double value, std::string display_value) {
+  if (lines_.find(line) == lines_.end())
+    add_line(line, Util::get_random_color());
+
+  lines_[line].add_point(1.0 - value, display_value);
+}
+
+void GraphView::set_color(std::string line, Gdk::RGBA rgba) {
+  lines_[line].set_color(rgba);
 }
 
 void GraphView::set_color(std::string line, double red, double green, double blue) {
@@ -94,9 +111,9 @@ void GraphView::resize(double ratio) {
 }
 
 void GraphView::set_sizes(std::string min, std::string middle, std::string max) {
-  label_min_->set_label(min);
-  label_middle_->set_text(middle);
-  label_max_->set_text(max);
+  label_min_->set_markup("<span size=\"small\">" + min + "</span>");
+  label_middle_->set_markup("<span size=\"small\">" + middle + "</span>");
+  label_max_->set_markup("<span size=\"small\">" + max + "</span>");
 }
 
 }

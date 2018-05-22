@@ -1,6 +1,7 @@
 #ifndef PROCESSMONITOR_WIDGETS_GRAPHVIEW_H_
 #define PROCESSMONITOR_WIDGETS_GRAPHVIEW_H_
 
+#include <sys/time.h>
 #include <gtkmm.h>
 #include <map>
 
@@ -13,11 +14,14 @@ class GraphView : public Gtk::Box {
   static GraphView* Create();
   GraphView(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder> &refGlade);
   void add_line(std::string line, double red, double green, double blue);
+  void add_line(std::string line, Gdk::RGBA rgba);
   // void remove_line(std::string line);
-  void add_point(std::string line, double value);
+  void add_point(std::string line, double value, std::string display_value);
   void set_color(std::string line, double red, double green, double blue);
+  void set_color(std::string line, Gdk::RGBA rgba);
   void resize(double ratio);
   void set_sizes(std::string min, std::string middle, std::string max);
+  void update(int timer);
 
  private:
   bool draw_graph(const Cairo::RefPtr<Cairo::Context>& context);

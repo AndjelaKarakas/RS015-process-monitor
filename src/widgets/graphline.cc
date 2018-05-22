@@ -2,10 +2,7 @@
 
 namespace ProcessMonitor {
 
-GraphLine::GraphLine() :
-  red_(0.0),
-  green_(0.0),
-  blue_(0.0) {
+GraphLine::GraphLine() {
   button_color_.signal_color_set().connect(
     sigc::mem_fun(*this, &GraphLine::color_changed)
   );
@@ -16,57 +13,59 @@ GraphLine::GraphLine() :
 }
 
 void GraphLine::color_changed() {
-  auto color = button_color_.get_rgba();
-  
-  red_ = color.get_red();
-  green_ = color.get_green();
-  blue_ = color.get_blue();
+  rgba_ = button_color_.get_rgba();
 }
 
-void GraphLine::add_point(double value) {
+void GraphLine::add_point(double value, std::string display_value) {
   if (points_.size() == 0)
-    posx_ = 1.0;
+    posx_ = 61000;
 
   points_.push_back(value);
+  label_title_.set_text(title_ + " (" + display_value + "): ");
+}
+
+void GraphLine::update(int& timer) {
+  if (posx_ < -1000)
+  {
+    points_.erase(points_.begin());
+    posx_ += 1000;
+  }
+
+  posx_ -= timer;
 }
 
 void GraphLine::draw(const Cairo::RefPtr<Cairo::Context>& context, int& width, int& height) {
   if (points_.size() == 0)
     return;
 
-  context->set_source_rgb(red_, green_, blue_);
+  context->set_source_rgb(rgba_.get_red(), rgba_.get_green(), rgba_.get_blue());
   context->set_line_width(2);
 
-  double pox = posx_;
-  context->move_to(pox * width, points_[0] * height);
+  int pox = posx_;
+  context->move_to(pox / 60000.0 * width, 2 + points_[0] * (height - 4));
 
   for (auto& point : points_) {
-    context->line_to(pox * width, point * height);
+    context->line_to(pox / 60000.0 * width, 2 + point * (height - 4));
 
-    pox += 0.1;
+    pox += 1000;
   }
 
-  if (posx_ < -0.1)
-  {
-    points_.erase(points_.begin());
-    posx_ += 0.1;
-  }
-  
-  posx_ -= 0.005;
   context->stroke();
 }
 
-void GraphLine::set_color(double red, double green, double blue) {
-  red_ = red;
-  green_ = green;
-  blue_ = blue;
-  
-  Gdk::RGBA rgba;
-  rgba.set_rgba(red, green, blue);
+void GraphLine::set_color(Gdk::RGBA rgba) {
+  rgba_ = rgba;
   button_color_.set_rgba(rgba);
 }
 
+void GraphLine::set_color(double red, double green, double blue) {
+  Gdk::RGBA rgba;
+  rgba.set_rgba(red, green, blue);
+  set_color(rgba);
+}
+
 void GraphLine::set_title(std::string title) {
+  title_ = title;
   label_title_.set_text(title + ": ");
 }
 
