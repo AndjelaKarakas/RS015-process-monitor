@@ -31,6 +31,11 @@ std::vector<int>& Core::get_pid_list() {
   return pids_;
 }
 
+bool Core::valid_pid(int pid) {
+  std::ifstream infile("/proc/" + std::to_string(pid) + "/stat");
+  return infile.good();
+}
+
 ProcessInfo& Core::get_pid_info(int pid) {
   auto elem = pid_info_.find(pid);
   long ujifs, kjifs;

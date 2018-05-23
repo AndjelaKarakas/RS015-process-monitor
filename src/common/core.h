@@ -36,6 +36,8 @@ class Core {
   // Use refresh() to actually update the list.
   std::vector<int>& get_pid_list();
 
+  bool valid_pid(int pid);
+
   // Gets the REFERENCE to the process information class.
   //
   // Use refresh() to update this value.

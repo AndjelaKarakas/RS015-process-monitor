@@ -56,6 +56,7 @@ bool MainWindow::on_timeout(int timer_number)
     // update core
     Core::getInstance().refresh();
     resourceview_->fetch();
+    processview_->update();
 
     timer_ = 25;
   }

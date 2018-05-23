@@ -2,10 +2,12 @@
 
 #include <gtkmm.h>
 
+#include "common/core.h"
+#include "common/util.h"
+
 namespace ProcessMonitor {
 
-ProcessView* ProcessView::Create()
-{
+ProcessView* ProcessView::Create() {
   auto builder = Gtk::Builder::create_from_resource("/widgets/processview.glade");
   ProcessMonitor::ProcessView *widget;
   builder->get_widget_derived("processview", widget);
@@ -54,18 +56,35 @@ ProcessView::ProcessView(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builde
   treeprocess_->get_column(5)->set_min_width(100);
   treeprocess_->get_column(6)->set_resizable(true);
   treeprocess_->get_column(6)->set_min_width(100);
+}
 
-  Gtk::TreeModel::Row row = *(model_->append());
-  row[column_name_] = "1";
-  row[column_pid_] = 2;
-  row[column_uid_] = 3;
-  row[column_priority_] = 4;
-  row[column_trackmemory_] = 5;
-  row[column_trackcpu_] = 6;
-  row[column_trackdisk_] = 7;
-  
-  
-  
+void ProcessView::update() {
+  auto& core = Core::getInstance();
+  auto& list = core.get_pid_list();
+
+  // add missing pids
+  for (auto& item : list)
+    if (pidmap_.find(item) == pidmap_.end())
+      pidmap_[item] = *(model_->append());
+
+  // update all pids and remove
+  for (auto& item : pidmap_) {
+    if (core.valid_pid(item.first)) {
+      auto& info = core.get_pid_info(item.first);
+      auto& row = item.second;
+
+      row[column_name_] = info.name;
+      row[column_pid_] = info.pid;
+      row[column_uid_] = info.uid;
+      row[column_priority_] = info.priority;
+      row[column_trackmemory_] = Util::bytes_to_string(info.memory);
+      row[column_trackcpu_] = info.get_cpu_percentage_usage();
+      row[column_trackdisk_] = Util::bytes_to_string(info.get_bytes_read() + info.get_bytes_written());
+    } else {
+      model_->erase(item.second);
+      pidmap_.erase(item.first);
+    }
+  }
 }
 
 }
