@@ -7,9 +7,11 @@ GraphLine::GraphLine() {
     sigc::mem_fun(*this, &GraphLine::color_changed)
   );
 
-  widget_color_selector_.pack_start(label_title_, false, true);
-  widget_color_selector_.pack_start(button_color_);
-  widget_color_selector_.pack_start(spacing_right_);
+  label_title_.set_xalign(0.0);
+
+  widget_color_selector_.set_spacing(6);
+  widget_color_selector_.pack_start(button_color_, false, true);
+  widget_color_selector_.pack_start(label_title_);
 }
 
 void GraphLine::color_changed() {
@@ -21,7 +23,7 @@ void GraphLine::add_point(double value, std::string display_value) {
     posx_ = 61000;
 
   points_.push_back(value);
-  label_title_.set_text(title_ + " (" + display_value + "): ");
+  label_title_.set_text(title_ + ": " + display_value);
 }
 
 void GraphLine::update(int& timer) {
