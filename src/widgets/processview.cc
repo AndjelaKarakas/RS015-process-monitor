@@ -73,7 +73,7 @@ void ProcessView::update() {
 
       row[column_name_] = info.name;
       row[column_pid_] = info.pid;
-      row[column_uid_] = info.uid;
+      row[column_uid_] = Util::uid_to_string(info.uid);
       row[column_priority_] = info.priority;
       row[column_trackmemory_] = Util::bytes_to_string(info.memory);
       row[column_trackcpu_] = info.get_cpu_percentage_usage();

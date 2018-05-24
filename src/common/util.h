@@ -4,6 +4,7 @@
 #include <gtkmm.h>
 #include <iostream>
 #include <vector>
+#include <map>
 
 namespace ProcessMonitor {
 
@@ -12,10 +13,12 @@ class Util {
   static Gdk::RGBA get_random_color();
   static std::string bytes_to_string(unsigned long bytes);
   static std::string percentage_to_string(double percentage);
+  static std::string& uid_to_string(int uid);
 
  private:
   static double colors_[];
   static int colorpos_;
+  static std::map<int, std::string> pidmap_;
 };
 
 }
