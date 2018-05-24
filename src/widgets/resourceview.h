@@ -7,7 +7,7 @@
 
 namespace ProcessMonitor {
 
-class ResourceView : public Gtk::Box {
+class ResourceView : public Gtk::ScrolledWindow {
  public:
   static ResourceView* Create();
   ResourceView(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder> &refGlade);
@@ -24,6 +24,7 @@ class ResourceView : public Gtk::Box {
   GraphView* network_view_;
   GraphView* drive_view_;
   Gtk::Label label_cpu_, label_memory_, label_network_, label_drive_;
+  Gtk::Box* resourceviewbox_;
   bool init_;
   long network_limit_, drive_limit_;
 };
