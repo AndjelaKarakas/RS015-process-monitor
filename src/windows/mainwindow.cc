@@ -72,9 +72,10 @@ void MainWindow::about_activated(const Glib::VariantBase& arg) {
   dialog.set_transient_for(*this);
 
   dialog.set_program_name("Process Monitor");
-  dialog.set_version("Version: 1.0.0");
-  dialog.set_license("Process Monitor is licenced under the MIT license");
-  dialog.set_comments("Process Monitor is a simple, Gtk based, process monitor for Linux!");
+  dialog.set_version("1.0.0");
+  dialog.set_license_type(Gtk::LICENSE_MIT_X11);
+  dialog.set_comments("A simple process monitoring tool.");
+  dialog.set_copyright("Copyright © 2018 The Process Monitor Authors");
   dialog.set_website("https://github.com/MATF-RS18/RS015-process-monitor");
   dialog.set_website_label("GitHub Page");
 
