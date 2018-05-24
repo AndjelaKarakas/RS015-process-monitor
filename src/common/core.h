@@ -36,6 +36,8 @@ class Core {
   // Use refresh() to actually update the list.
   std::vector<int>& get_pid_list();
 
+  bool valid_pid(int pid);
+
   // Gets the REFERENCE to the process information class.
   //
   // Use refresh() to update this value.
@@ -67,6 +69,8 @@ class Core {
 
 private:
   Core();
+
+  bool valid_drive_name(std::string name);
 
   // Process related stuff
   DIR* proc_dir_;

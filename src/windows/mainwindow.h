@@ -16,6 +16,7 @@ class MainWindow : public Gtk::Window {
   void connect_app_menu(Glib::RefPtr<Gtk::Application> app);
 
  private:
+  bool on_timeout(int timer_number);
   void on_tabbutton1_activate();
   void on_tabbutton2_activate();
   void about_activated(const Glib::VariantBase& arg);
@@ -28,6 +29,7 @@ class MainWindow : public Gtk::Window {
   Gtk::Notebook* notebookmain_;
   ProcessView* processview_;
   ResourceView* resourceview_;
+  int timer_;
 };
 
 }

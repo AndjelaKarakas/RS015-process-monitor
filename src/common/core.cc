@@ -31,6 +31,11 @@ std::vector<int>& Core::get_pid_list() {
   return pids_;
 }
 
+bool Core::valid_pid(int pid) {
+  std::ifstream infile("/proc/" + std::to_string(pid) + "/stat");
+  return infile.good();
+}
+
 ProcessInfo& Core::get_pid_info(int pid) {
   auto elem = pid_info_.find(pid);
   long ujifs, kjifs;
@@ -164,7 +169,7 @@ void Core::refresh() {
 
     steam_diskstats_ >> name;                // device name
     steam_diskstats_.ignore(1);
-    valid = (name.find("sd") == 0);
+    valid = valid_drive_name(name);
 
     steam_diskstats_.ignore(255, ' ');       // reads completed successfully
     steam_diskstats_.ignore(255, ' ');       // reads merged
@@ -245,6 +250,14 @@ void Core::refresh() {
 
   // Poll Network
   net_info_.update();
+}
+
+bool Core::valid_drive_name(std::string name) {
+  for (auto& c : name)
+    if (isdigit(c))
+      return false;
+
+  return (name.find("sd") == 0);
 }
 
 }

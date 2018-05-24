@@ -42,6 +42,7 @@
       "utility": "cpp",
       "valarray": "cpp",
       "string": "cpp",
-      "fstream": "cpp"
+      "fstream": "cpp",
+      "iomanip": "cpp"
     }
   }

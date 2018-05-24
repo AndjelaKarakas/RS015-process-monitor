@@ -19,7 +19,7 @@ double CpuInfo::get_total_jifs() {
 }
 
 double CpuInfo::get_percentage_usage() {
-  return (100.0 * used_jifs_) / (used_jifs_ + free_jifs_);
+  return ((double)used_jifs_) / (used_jifs_ + free_jifs_);
 }
 
 void CpuInfo::update(long total_used_jifs, long total_free_jifs) {
