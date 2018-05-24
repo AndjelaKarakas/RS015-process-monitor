@@ -41,21 +41,19 @@ ProcessView::ProcessView(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builde
   treeprocess_->append_column("Track memory", column_trackmemory_);
   treeprocess_->append_column("Track CPU", column_trackcpu_);
   treeprocess_->append_column("Track dick", column_trackdisk_);
+  
+  treeprocess_->get_column(0)->set_sort_column(column_pid_);
+  treeprocess_->get_column(1)->set_sort_column(column_name_);
+  treeprocess_->get_column(2)->set_sort_column(column_uid_);
+  treeprocess_->get_column(3)->set_sort_column(column_priority_);
+  treeprocess_->get_column(4)->set_sort_column(column_trackmemory_);
+  treeprocess_->get_column(5)->set_sort_column(column_trackcpu_);
+  treeprocess_->get_column(6)->set_sort_column(column_trackdisk_);
 
-  treeprocess_->get_column(0)->set_resizable(true);
-  treeprocess_->get_column(0)->set_min_width(100);
-  treeprocess_->get_column(1)->set_resizable(true);
-  treeprocess_->get_column(1)->set_min_width(100);
-  treeprocess_->get_column(2)->set_resizable(true);
-  treeprocess_->get_column(2)->set_min_width(100);
-  treeprocess_->get_column(3)->set_resizable(true);
-  treeprocess_->get_column(3)->set_min_width(100);
-  treeprocess_->get_column(4)->set_resizable(true);
-  treeprocess_->get_column(4)->set_min_width(100);
-  treeprocess_->get_column(5)->set_resizable(true);
-  treeprocess_->get_column(5)->set_min_width(100);
-  treeprocess_->get_column(6)->set_resizable(true);
-  treeprocess_->get_column(6)->set_min_width(100);
+  for (int i = 0; i < 7; i++) {
+    treeprocess_->get_column(i)->set_resizable(true);
+    treeprocess_->get_column(i)->set_min_width(100);
+  }
 }
 
 void ProcessView::update() {
