@@ -1,6 +1,8 @@
 #include "util.h"
 
 #include <iomanip>
+#include <sys/types.h>
+#include <pwd.h>
 
 namespace ProcessMonitor {
 
@@ -15,6 +17,8 @@ double Util::colors_[] = {
   0.45, 0.30, 0.47,
   0.53, 0.36, 0.07
 };
+
+std::map<int, std::string> Util::pidmap_;
 
 Gdk::RGBA Util::get_random_color() {
   colorpos_ += 3;
@@ -46,6 +50,19 @@ std::string Util::percentage_to_string(double percentage) {
   ret << std::fixed << std::setprecision(1) << percentage * 100.0 << "%";
 
   return ret.str();
+}
+
+std::string& Util::uid_to_string(int uid) {
+  auto item = pidmap_.find(uid);
+
+  if (item == pidmap_.end()) {
+    struct passwd *pwd = getpwuid(uid);
+    pidmap_[uid] = std::string(pwd->pw_name);
+
+    item = pidmap_.find(uid);
+  }
+
+  return item->second;
 }
 
 }

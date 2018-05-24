@@ -21,7 +21,7 @@ class ProcessView : public Gtk::Widget {
   Gtk::TreeModel::ColumnRecord record_;
   Gtk::TreeModelColumn<Glib::ustring> column_name_;
   Gtk::TreeModelColumn<uint> column_pid_;
-  Gtk::TreeModelColumn<uint> column_uid_;
+  Gtk::TreeModelColumn<Glib::ustring> column_uid_;
   Gtk::TreeModelColumn<int> column_priority_;
   Gtk::TreeModelColumn<Glib::ustring> column_trackmemory_;
   Gtk::TreeModelColumn<int> column_trackcpu_;
