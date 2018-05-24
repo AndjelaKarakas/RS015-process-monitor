@@ -16,12 +16,14 @@ ResourceView* ResourceView::Create() {
 }
 
 ResourceView::ResourceView(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>& refGlade) :
-  Gtk::Box(cobject),
+  Gtk::ScrolledWindow(cobject),
   builder_(refGlade),
   init_(false),
   network_limit_(1024),
   drive_limit_(1024)
 {
+  builder_->get_widget("resourceviewbox", resourceviewbox_);
+
   cpu_view_ = GraphView::Create();
   cpu_view_->set_sizes("0%", "50%", "100%");
 
@@ -36,20 +38,20 @@ ResourceView::ResourceView(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Buil
   drive_view_ = GraphView::Create();
 
   set_props(label_cpu_, "CPU:");
-  pack_start(label_cpu_, false, true);
-  pack_start(*cpu_view_);
+  resourceviewbox_->pack_start(label_cpu_, false, true);
+  resourceviewbox_->pack_start(*cpu_view_);
 
   set_props(label_memory_, "Memory:");
-  pack_start(label_memory_, false, true);
-  pack_start(*memory_view_);
+  resourceviewbox_->pack_start(label_memory_, false, true);
+  resourceviewbox_->pack_start(*memory_view_);
 
   set_props(label_network_, "Network:");
-  pack_start(label_network_, false, true);
-  pack_start(*network_view_);
+  resourceviewbox_->pack_start(label_network_, false, true);
+  resourceviewbox_->pack_start(*network_view_);
 
   set_props(label_drive_, "Drives:");
-  pack_start(label_drive_, false, true);
-  pack_start(*drive_view_);
+  resourceviewbox_->pack_start(label_drive_, false, true);
+  resourceviewbox_->pack_start(*drive_view_);
 }
 
 void ResourceView::set_props(Gtk::Label& label, std::string text) {
