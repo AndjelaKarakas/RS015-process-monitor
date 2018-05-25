@@ -3,6 +3,7 @@ gnome = import('gnome')
 
 # project dependencies
 gtkdep = dependency('gtkmm-3.0')
+threaddep = dependency('threads')
 
 src = [
   'main.cc',
@@ -48,5 +49,5 @@ executable(
   'process-monitor',
   src,
   resources,
-  dependencies: gtkdep
+  dependencies: [ gtkdep, threaddep ]
 )

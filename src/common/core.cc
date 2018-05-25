@@ -37,71 +37,7 @@ bool Core::valid_pid(int pid) {
 }
 
 ProcessInfo& Core::get_pid_info(int pid) {
-  auto elem = pid_info_.find(pid);
-  long ujifs, kjifs;
-  long bytes_read = 0;
-  long bytes_written = 0;
-  std::string temp;
-
-  if (elem == pid_info_.end())
-  {
-    pid_info_[pid] = ProcessInfo();
-    elem = pid_info_.find(pid);
-  }
-
-  if (stat(("/proc/" + std::to_string(pid)).c_str(), &statbuf_) == 0)
-    elem->second.uid = statbuf_.st_uid;
-
-  std::ifstream iofile("/proc/" + std::to_string(pid) + "/io");
-  while (iofile.peek() != EOF) {
-    iofile >> temp;
-    if (temp == "read_bytes:")
-      iofile >> bytes_read;
-    else if (temp == "write_bytes:")
-      iofile >> bytes_written;
-    else
-      iofile.ignore(255, '\n');
-  }
-
-  std::ifstream infile("/proc/" + std::to_string(pid) + "/stat");
-  
-  infile >> elem->second.pid;         // process id
-  infile >> elem->second.name;        // filename of the executable
-  infile.ignore(1);
-  
-  infile.ignore(255, ' ');            // state (R is running, S is sleeping, D is sleeping in an uninterruptible wait, Z is zombie, T is traced or stopped)
-  infile.ignore(255, ' ');            // process id of the parent process
-  infile.ignore(255, ' ');            // pgrp of the process
-  infile.ignore(255, ' ');            // session id
-  infile.ignore(255, ' ');            // tty the process uses
-  infile.ignore(255, ' ');            // pgrp of the tty
-  infile.ignore(255, ' ');            // task flags
-  infile.ignore(255, ' ');            // number of minor faults
-  infile.ignore(255, ' ');            // number of minor faults with child's
-  infile.ignore(255, ' ');            // number of major faults
-  infile.ignore(255, ' ');            // number of major faults with child's
-  
-  infile >> ujifs;                    // user mode jiffies
-  infile >> kjifs;                    // user mode jiffies
-  infile.ignore(1);
-  
-  infile.ignore(255, ' ');            // user mode jiffies with child's
-  infile.ignore(255, ' ');            // kernel mode jiffies with child's
-
-  infile >> elem->second.priority;    // priority level
-  infile >> elem->second.nice_level;  // nice level
-  infile.ignore(1);
-
-  infile.ignore(255, ' ');            // number of threads
-  infile.ignore(255, ' ');            // (obsolete, always 0)
-  infile.ignore(255, ' ');            // time the process started after system boot
-
-  infile >> elem->second.memory;      // virtual memory size
-
-  infile.close();
-
-  elem->second.update(ujifs + kjifs, bytes_read, bytes_written);
-  return elem->second;
+  return pid_info_[pid];
 }
 
 SysMemoryInfo& Core::get_memory_usage() {
@@ -143,8 +79,103 @@ void Core::refresh() {
       }
     }
 
-    if (curnum != -1)
+    if (curnum != -1) {
       pids_.push_back(curnum);
+
+      auto pid = curnum;
+      auto elem = pid_info_.find(pid);
+
+      // update pid info
+      long ujifs, kjifs;
+      long bytes_read = 0;
+      long bytes_written = 0;
+      std::string temp;
+
+      if (elem == pid_info_.end())
+      {
+        pid_info_[pid] = ProcessInfo();
+        elem = pid_info_.find(pid);
+      }
+
+      if (stat(("/proc/" + std::to_string(pid)).c_str(), &statbuf_) == 0)
+        elem->second.uid = statbuf_.st_uid;
+
+      auto& iofile = elem->second.iostream;
+      if (!iofile.is_open())
+        iofile.open("/proc/" + std::to_string(pid) + "/io");
+      iofile.seekg(0, std::ios::beg);
+      while (iofile.peek() != EOF) {
+        iofile >> temp;
+        if (temp == "read_bytes:")
+          iofile >> bytes_read;
+        else if (temp == "write_bytes:")
+          iofile >> bytes_written;
+        else
+          iofile.ignore(255, '\n');
+      }
+      iofile.clear();
+
+      auto& infile = elem->second.statstream;
+      if (!infile.is_open())
+        infile.open("/proc/" + std::to_string(pid) + "/stat");
+      infile.seekg(0, std::ios::beg);
+      
+      infile >> elem->second.pid;         // process id
+      infile >> elem->second.name;        // filename of the executable
+      infile.ignore(1);
+      
+      infile.ignore(255, ' ');            // state (R is running, S is sleeping, D is sleeping in an uninterruptible wait, Z is zombie, T is traced or stopped)
+      infile.ignore(255, ' ');            // process id of the parent process
+      infile.ignore(255, ' ');            // pgrp of the process
+      infile.ignore(255, ' ');            // session id
+      infile.ignore(255, ' ');            // tty the process uses
+      infile.ignore(255, ' ');            // pgrp of the tty
+      infile.ignore(255, ' ');            // task flags
+      infile.ignore(255, ' ');            // number of minor faults
+      infile.ignore(255, ' ');            // number of minor faults with child's
+      infile.ignore(255, ' ');            // number of major faults
+      infile.ignore(255, ' ');            // number of major faults with child's
+      
+      infile >> ujifs;                    // user mode jiffies
+      infile >> kjifs;                    // user mode jiffies
+      infile.ignore(1);
+      
+      infile.ignore(255, ' ');            // user mode jiffies with child's
+      infile.ignore(255, ' ');            // kernel mode jiffies with child's
+
+      infile >> elem->second.priority;    // priority level
+      infile >> elem->second.nice_level;  // nice level
+      infile.clear();
+
+      // Get memory info
+      auto& smapsfile = elem->second.mapstream;
+      if (!smapsfile.is_open())
+        smapsfile.open("/proc/" + std::to_string(pid) + "/smaps");
+      smapsfile.seekg(0, std::ios::beg);
+      bool readme = false;
+      int extramemory;
+
+      elem->second.memory = 0;
+      while (smapsfile.peek() != EOF) { // Dear god, this is bad, OPTIMIZE!!!
+        if (readme) {
+          smapsfile >> extramemory;
+          elem->second.memory += extramemory;
+          readme = false;
+
+          if (extramemory > 0) {
+            readme = false;
+          }
+        } else {
+          smapsfile >> temp;
+          if (temp == "Private_Dirty:")
+            readme = true;
+        }
+      }
+      smapsfile.clear();
+      elem->second.memory *= 1024;
+
+      elem->second.update(ujifs + kjifs, bytes_read, bytes_written);
+    }
   }
 
   // Poll RAM

@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 
 #include <iostream>
+#include <thread>
 #include <gtkmm.h>
 
 #include "common/core.h"
@@ -20,7 +21,8 @@ MainWindow* MainWindow::Create() {
 MainWindow::MainWindow(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>& refGlade) :
   Gtk::Window(cobject),
   builder_(refGlade),
-  timer_(0)
+  timer_(0),
+  worker_thread_(worker_thread)
 {
   // init MainWindow data
   builder_->get_widget("radioprocess", radioprocess_);
@@ -63,16 +65,22 @@ void MainWindow::connect_app_menu(Glib::RefPtr<Gtk::Application> app) {
   app->add_action(quit_item);
 }
 
-bool MainWindow::on_timeout(int timer_number)
-{
+void MainWindow::worker_thread() {
+  Core::getInstance().refresh();
+}
+
+bool MainWindow::on_timeout(int timer_number) {
   if (timer_ == 0)
   {
+    worker_thread_.join();
+
     // update core
-    Core::getInstance().refresh();
     resourceview_->fetch();
     processview_->update();
 
     timer_ = 25;
+
+    worker_thread_ = std::thread(worker_thread);
   }
   timer_--;
 
@@ -81,8 +89,7 @@ bool MainWindow::on_timeout(int timer_number)
   return true;
 }
 
-void MainWindow::on_tabbutton1_activate()
-{
+void MainWindow::on_tabbutton1_activate() {
   notebookmain_->set_current_page(0);
 }
 

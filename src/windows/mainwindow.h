@@ -2,6 +2,7 @@
 #define PROCESSMONITOR_WINDOWS_MAINWINDOW_H_
 
 #include <gtkmm.h>
+#include <thread>
 
 #include "widgets/resourceview.h"
 #include "widgets/processview.h"
@@ -22,6 +23,8 @@ class MainWindow : public Gtk::Window {
   void about_activated(const Glib::VariantBase& arg);
   void quit_activated(const Glib::VariantBase& arg);
 
+  static void worker_thread();
+
   Glib::RefPtr<Gtk::Application> app_;
   Glib::RefPtr<Gtk::Builder> builder_;
   Gtk::RadioButton* radioprocess_;
@@ -30,6 +33,7 @@ class MainWindow : public Gtk::Window {
   ProcessView* processview_;
   ResourceView* resourceview_;
   int timer_;
+  std::thread worker_thread_;
 };
 
 }

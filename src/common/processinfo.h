@@ -1,6 +1,7 @@
 #ifndef PROCESSMONITOR_COMMON_PROCESSINFO_H_
 #define PROCESSMONITOR_COMMON_PROCESSINFO_H_
 
+#include <fstream>
 #include <string>
 #include <map>
 
@@ -35,6 +36,12 @@ class ProcessInfo {
 
   // Nice level, goes from -20 to 19.
   int nice_level;
+
+  std::ifstream statstream;
+
+  std::ifstream mapstream;
+
+  std::ifstream iostream;
 
  private:
   long total_cpu_jits_;
