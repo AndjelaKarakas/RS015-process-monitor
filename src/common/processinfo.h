@@ -37,6 +37,8 @@ class ProcessInfo {
   // Nice level, goes from -20 to 19.
   int nice_level;
 
+  long total_cpu_jits;
+
   std::ifstream statstream;
 
   std::ifstream mapstream;
@@ -44,7 +46,6 @@ class ProcessInfo {
   std::ifstream iostream;
 
  private:
-  long total_cpu_jits_;
   long cpu_jits_;
   long total_bytes_read_;
   long bytes_read_;

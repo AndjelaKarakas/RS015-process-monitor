@@ -148,31 +148,33 @@ void Core::refresh() {
       infile.clear();
 
       // Get memory info
-      auto& smapsfile = elem->second.mapstream;
-      if (!smapsfile.is_open())
-        smapsfile.open("/proc/" + std::to_string(pid) + "/smaps");
-      smapsfile.seekg(0, std::ios::beg);
-      bool readme = false;
-      int extramemory;
+      if (elem->second.total_cpu_jits > ujifs + kjifs || elem->second.total_cpu_jits == -1) {
+        auto& smapsfile = elem->second.mapstream;
+        if (!smapsfile.is_open())
+          smapsfile.open("/proc/" + std::to_string(pid) + "/smaps");
+        smapsfile.seekg(0, std::ios::beg);
+        bool readme = false;
+        int extramemory;
 
-      elem->second.memory = 0;
-      while (smapsfile.peek() != EOF) { // Dear god, this is bad, OPTIMIZE!!!
-        if (readme) {
-          smapsfile >> extramemory;
-          elem->second.memory += extramemory;
-          readme = false;
-
-          if (extramemory > 0) {
+        elem->second.memory = 0;
+        while (smapsfile.peek() != EOF) { // Dear god, this is bad, OPTIMIZE!!!
+          if (readme) {
+            smapsfile >> extramemory;
+            elem->second.memory += extramemory;
             readme = false;
+
+            if (extramemory > 0) {
+              readme = false;
+            }
+          } else {
+            smapsfile >> temp;
+            if (temp == "Private_Dirty:")
+              readme = true;
           }
-        } else {
-          smapsfile >> temp;
-          if (temp == "Private_Dirty:")
-            readme = true;
         }
+        smapsfile.clear();
+        elem->second.memory *= 1024;
       }
-      smapsfile.clear();
-      elem->second.memory *= 1024;
 
       elem->second.update(ujifs + kjifs, bytes_read, bytes_written);
     }

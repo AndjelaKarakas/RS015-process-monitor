@@ -6,7 +6,7 @@
 namespace ProcessMonitor {
   
 ProcessInfo::ProcessInfo() :
-  total_cpu_jits_(-1),
+  total_cpu_jits(-1),
   cpu_jits_(0),
   total_bytes_read_(0),
   bytes_read_(0),
@@ -28,14 +28,14 @@ double ProcessInfo::get_cpu_percentage_usage() {
 }
   
 void ProcessInfo::update(long cpu_jits, long bytes_read, long bytes_written) {
-  if (total_cpu_jits_ != -1)
+  if (total_cpu_jits != -1)
   {
-    cpu_jits_ = cpu_jits - total_cpu_jits_;
+    cpu_jits_ = cpu_jits - total_cpu_jits;
     bytes_read_ = bytes_read - total_bytes_read_;
     bytes_written_ = bytes_written - total_bytes_written_;
   }
 
-  total_cpu_jits_ = cpu_jits;
+  total_cpu_jits = cpu_jits;
   total_bytes_read_ = bytes_read;
   total_bytes_written_ = bytes_written;
 }
