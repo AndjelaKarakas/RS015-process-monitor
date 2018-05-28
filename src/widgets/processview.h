@@ -26,6 +26,8 @@ class ProcessView : public Gtk::Widget {
   Gtk::TreeModelColumn<Glib::ustring> column_trackmemory_;
   Gtk::TreeModelColumn<int> column_trackcpu_;
   Gtk::TreeModelColumn<Glib::ustring> column_trackdisk_;
+  Gtk::TreeModelColumn<long> column_modelmemory_;
+  Gtk::TreeModelColumn<int> column_modelcpu_;
 };
 
 }

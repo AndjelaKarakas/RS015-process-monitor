@@ -30,6 +30,8 @@ ProcessView::ProcessView(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builde
   record_.add(column_trackmemory_);
   record_.add(column_trackcpu_);
   record_.add(column_trackdisk_);
+  record_.add(column_modelmemory_);
+  record_.add(column_modelcpu_);
 
   model_= Gtk::TreeStore::create(record_);
   treeprocess_->set_model(model_);
@@ -46,8 +48,8 @@ ProcessView::ProcessView(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builde
   treeprocess_->get_column(1)->set_sort_column(column_name_);
   treeprocess_->get_column(2)->set_sort_column(column_uid_);
   treeprocess_->get_column(3)->set_sort_column(column_priority_);
-  treeprocess_->get_column(4)->set_sort_column(column_trackmemory_);
-  treeprocess_->get_column(5)->set_sort_column(column_trackcpu_);
+  treeprocess_->get_column(4)->set_sort_column(column_modelmemory_);
+  treeprocess_->get_column(5)->set_sort_column(column_modelcpu_);
   treeprocess_->get_column(6)->set_sort_column(column_trackdisk_);
 
   for (int i = 0; i < 7; i++) {
@@ -76,7 +78,9 @@ void ProcessView::update() {
       row[column_uid_] = Util::uid_to_string(info.uid);
       row[column_priority_] = info.priority;
       row[column_trackmemory_] = Util::bytes_to_string(info.memory);
+      row[column_modelmemory_] = -info.memory;
       row[column_trackcpu_] = info.get_cpu_percentage_usage();
+      row[column_modelcpu_] = -info.get_cpu_percentage_usage();
       row[column_trackdisk_] = Util::bytes_to_string(info.get_bytes_read() + info.get_bytes_written());
     } else {
       model_->erase(item.second);
