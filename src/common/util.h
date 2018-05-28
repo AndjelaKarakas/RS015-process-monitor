@@ -14,11 +14,13 @@ class Util {
   static std::string bytes_to_string(unsigned long bytes);
   static std::string percentage_to_string(double percentage);
   static std::string& uid_to_string(int uid);
+  static std::string pid_to_string(int pid);
 
  private:
   static double colors_[];
   static int colorpos_;
   static std::map<int, std::string> pidmap_;
+  static char array_[];
 };
 
 }
