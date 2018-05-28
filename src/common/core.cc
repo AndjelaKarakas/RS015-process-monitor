@@ -80,6 +80,9 @@ void Core::refresh() {
     }
 
     if (curnum != -1) {
+      if (stat(("/proc/" + std::to_string(curnum) + "/exe").c_str(), &statbuf_) != 0)
+        continue;
+        
       pids_.push_back(curnum);
 
       auto pid = curnum;
