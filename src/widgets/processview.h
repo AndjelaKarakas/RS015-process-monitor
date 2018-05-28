@@ -12,6 +12,8 @@ class ProcessView : public Gtk::Widget {
   ProcessView(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder> &refGlade);
 
   void update();
+  bool treeprocess_buttonpress(GdkEventButton* button);
+  void item_kill_activate();
 
  private:
   Glib::RefPtr<Gtk::Builder> builder_;
@@ -28,6 +30,7 @@ class ProcessView : public Gtk::Widget {
   Gtk::TreeModelColumn<Glib::ustring> column_trackdisk_;
   Gtk::TreeModelColumn<long> column_modelmemory_;
   Gtk::TreeModelColumn<int> column_modelcpu_;
+  Gtk::Menu context_menu_;
 };
 
 }

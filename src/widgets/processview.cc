@@ -1,5 +1,7 @@
 #include "processview.h"
 
+#include <sys/types.h>
+#include <signal.h>
 #include <gtkmm.h>
 
 #include "common/core.h"
@@ -55,6 +57,34 @@ ProcessView::ProcessView(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builde
   for (int i = 0; i < 7; i++) {
     treeprocess_->get_column(i)->set_resizable(true);
     treeprocess_->get_column(i)->set_min_width(100);
+  }
+
+  auto item = Gtk::manage(new Gtk::MenuItem("Kill Process"));
+  item->signal_activate().connect(
+    sigc::mem_fun(*this, &ProcessView::item_kill_activate)
+  );
+  context_menu_.append(*item);
+  context_menu_.show_all();
+
+  treeprocess_->signal_button_press_event().connect(
+    sigc::mem_fun(*this, &ProcessView::treeprocess_buttonpress), 
+    false
+  );
+}
+
+bool ProcessView::treeprocess_buttonpress(GdkEventButton* button) {
+  if (treeprocess_->get_selection() && treeprocess_->get_selection()->get_selected() && button->button == 3 && button->type == GDK_BUTTON_PRESS)
+    context_menu_.popup_at_pointer((GdkEvent*)button);
+
+  return false;
+}
+
+void ProcessView::item_kill_activate() {
+  auto selection = treeprocess_->get_selection();
+  if (selection) {
+    auto pid = selection->get_selected()->get_value(column_pid_);
+
+    kill(pid, SIGKILL);
   }
 }
 
