@@ -1,8 +1,10 @@
 #include "util.h"
 
-#include <iomanip>
 #include <sys/types.h>
+#include <libgen.h>
+#include <iomanip>
 #include <pwd.h>
+#include <unistd.h>
 
 namespace ProcessMonitor {
 
@@ -19,6 +21,8 @@ double Util::colors_[] = {
 };
 
 std::map<int, std::string> Util::pidmap_;
+
+char Util::array_[1024];
 
 Gdk::RGBA Util::get_random_color() {
   colorpos_ += 3;
@@ -63,6 +67,14 @@ std::string& Util::uid_to_string(int uid) {
   }
 
   return item->second;
+}
+
+std::string Util::pid_to_string(int pid) {
+  auto pathname = "/proc/" + std::to_string(pid) + "/exe";
+  auto link = readlink(pathname.c_str(), array_, 1024);
+  array_[link] = '\0';
+
+  return std::string(basename(array_));
 }
 
 }

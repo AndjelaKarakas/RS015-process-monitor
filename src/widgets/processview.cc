@@ -73,7 +73,7 @@ void ProcessView::update() {
       auto& info = core.get_pid_info(item.first);
       auto& row = item.second;
 
-      row[column_name_] = info.name;
+      row[column_name_] = Util::pid_to_string(info.pid);
       row[column_pid_] = info.pid;
       row[column_uid_] = Util::uid_to_string(info.uid);
       row[column_priority_] = info.priority;
